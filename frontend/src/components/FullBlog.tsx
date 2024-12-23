@@ -3,6 +3,16 @@ import { Appbar } from "./Appbar";
 import { Avatar } from "./BlogCard";
 
 export const FullBlog = ({ blog }: { blog: Blog }) => {
+  // Format the current date or a passed date
+  const formatDate = (date: Date) => {
+    return new Date(date).toLocaleDateString("en-US", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+  const publishedDate = formatDate(new Date());
+
   return (
     <div>
       <Appbar authorName={blog.author.name || "Anonymous"} />
@@ -11,7 +21,7 @@ export const FullBlog = ({ blog }: { blog: Blog }) => {
         <div className="grid grid-cols-12 px-10 w-full pt-200 max-w-screen-xl pt-12">
           <div className="col-span-8">
             <div className="text-5xl font-extrabold">{blog.title}</div>
-            <div className="text-slate-500 pt-2">Post on 2nd December 2023</div>
+            <div className="text-slate-500 pt-2">Post on {publishedDate}</div>
             <div className="pt-4">{blog.content}</div>
           </div>
           <div className="col-span-4">
