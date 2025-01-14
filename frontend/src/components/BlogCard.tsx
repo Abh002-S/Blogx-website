@@ -1,9 +1,21 @@
 import { Link } from "react-router-dom";
+
+// Function to format date
+const formatDate = (date: string) => {
+  const dateObj = new Date(date);
+  return dateObj.toLocaleDateString("en-US", {
+    weekday: "long",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+};
+
 interface BlogCardProps {
   authorName: string;
   title: string;
   content: string;
-  publishedDate: string;
+  startTime: string; // Renamed from startDate to startTime
   id: number;
 }
 
@@ -12,7 +24,7 @@ export const BlogCard = ({
   authorName,
   title,
   content,
-  publishedDate,
+  startTime, // Renamed from startDate
 }: BlogCardProps) => {
   return (
     <Link to={`/blog/${id}`}>
@@ -26,7 +38,8 @@ export const BlogCard = ({
             <Circle />
           </div>
           <div className="pl-2 font-thin text-slate-500 text-sm flex justify-center flex-col">
-            {publishedDate}
+            {/* Displaying formatted startTime */}
+            {formatDate(startTime)}
           </div>
         </div>
         <div className="text-xl font-semibold pt-2">{title}</div>

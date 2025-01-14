@@ -6,20 +6,20 @@ import { useState, useEffect } from "react";
 
 export const Blogs = () => {
   const { loading, blogs } = useBlogs();
-  const [blogDates, setBlogDates] = useState<{ [key: number]: Date }>({});
+  const [blogTimes, setBlogTimes] = useState<{ [key: number]: string }>({}); // Changed type to store as string
 
-  // Set current date for blogs if not already set
+  // Set startTime for blogs if not already set
   useEffect(() => {
     if (!loading && blogs.length > 0) {
-      const dates = blogs.reduce((acc, blog) => {
-        if (!blogDates[blog.id]) {
-          acc[blog.id] = new Date(); // Assign current date
+      const times = blogs.reduce((acc, blog) => {
+        if (!blogTimes[blog.id]) {
+          acc[blog.id] = blog.startTime; // Use startTime from blog data
         } else {
-          acc[blog.id] = blogDates[blog.id]; // Preserve existing date
+          acc[blog.id] = blogTimes[blog.id]; // Preserve existing time
         }
         return acc;
-      }, {} as { [key: number]: Date });
-      setBlogDates((prevDates) => ({ ...prevDates, ...dates }));
+      }, {} as { [key: number]: string });
+      setBlogTimes((prevTimes) => ({ ...prevTimes, ...times }));
     }
   }, [loading, blogs]);
 
@@ -39,16 +39,19 @@ export const Blogs = () => {
       </div>
     );
   }
+
   const firstBlogAuthorName =
     blogs.length > 0 ? blogs[0].author.name : "Anonymous";
 
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString("en-US", {
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
       day: "numeric",
       month: "short",
       year: "numeric",
     });
   };
+
   return (
     <div>
       <Appbar authorName={firstBlogAuthorName} />
@@ -56,11 +59,14 @@ export const Blogs = () => {
         <div>
           {blogs.map((blog) => (
             <BlogCard
+              key={blog.id}
               id={blog.id}
               authorName={blog.author.name || "Anonymous"}
               title={blog.title}
               content={blog.content}
-              publishedDate={formatDate(blogDates[blog.id] || new Date())}
+              startTime={formatTime(
+                blogTimes[blog.id] || new Date().toISOString()
+              )} // Updated to use startTime
             />
           ))}
         </div>

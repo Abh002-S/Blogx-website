@@ -14,6 +14,7 @@ export const blogRouter = new Hono<{
   };
 }>();
 
+// Middleware to verify user authentication
 blogRouter.use("/*", async (c, next) => {
   const authHeader = c.req.header("authorization") || "";
   try {
@@ -35,6 +36,7 @@ blogRouter.use("/*", async (c, next) => {
   }
 });
 
+// POST: Create a new blog
 blogRouter.post("/", async (c) => {
   const body = await c.req.json();
   const { success } = createBlogInput.safeParse(body);
@@ -50,10 +52,12 @@ blogRouter.post("/", async (c) => {
     datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate());
 
+  // Set startTime to the current date and time when the post is created
   const blog = await prisma.blog.create({
     data: {
       title: body.title,
       content: body.content,
+      startTime: new Date(), // Automatically set current date and time for startTime
       authorId: Number(authorId),
     },
   });
@@ -63,6 +67,7 @@ blogRouter.post("/", async (c) => {
   });
 });
 
+// PUT: Update an existing blog
 blogRouter.put("/", async (c) => {
   const body = await c.req.json();
   const { success } = updateBlogInput.safeParse(body);
@@ -84,6 +89,7 @@ blogRouter.put("/", async (c) => {
     data: {
       title: body.title,
       content: body.content,
+      startTime: new Date(), // Update the startTime if needed (optional)
     },
   });
 
@@ -92,16 +98,18 @@ blogRouter.put("/", async (c) => {
   });
 });
 
-// Todo: add pagination
+// GET: Fetch multiple blogs (bulk)
 blogRouter.get("/bulk", async (c) => {
   const prisma = new PrismaClient({
     datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate());
+
   const blogs = await prisma.blog.findMany({
     select: {
       content: true,
       title: true,
       id: true,
+      startTime: true, // Include startTime in the response
       author: {
         select: {
           name: true,
@@ -115,6 +123,7 @@ blogRouter.get("/bulk", async (c) => {
   });
 });
 
+// GET: Fetch a specific blog by ID
 blogRouter.get("/:id", async (c) => {
   const id = c.req.param("id");
   const prisma = new PrismaClient({
@@ -130,6 +139,7 @@ blogRouter.get("/:id", async (c) => {
         id: true,
         title: true,
         content: true,
+        startTime: true, // Include startTime in the response
         author: {
           select: {
             name: true,
@@ -142,7 +152,7 @@ blogRouter.get("/:id", async (c) => {
       blog,
     });
   } catch (e) {
-    c.status(411); // 4
+    c.status(411);
     return c.json({
       message: "Error while fetching blog post",
     });

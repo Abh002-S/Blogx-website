@@ -3,15 +3,18 @@ import { Appbar } from "./Appbar";
 import { Avatar } from "./BlogCard";
 
 export const FullBlog = ({ blog }: { blog: Blog }) => {
-  // Format the current date or a passed date
-  const formatDate = (date: Date) => {
+  // Format the given date
+  const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString("en-US", {
       day: "numeric",
       month: "long",
       year: "numeric",
     });
   };
-  const publishedDate = formatDate(new Date());
+
+  const startDate = blog.startTime
+    ? formatDate(blog.startTime)
+    : "Date not available";
 
   return (
     <div>
@@ -21,7 +24,10 @@ export const FullBlog = ({ blog }: { blog: Blog }) => {
         <div className="grid grid-cols-12 px-10 w-full pt-200 max-w-screen-xl pt-12">
           <div className="col-span-8">
             <div className="text-5xl font-extrabold">{blog.title}</div>
-            <div className="text-slate-500 pt-2">Post on {publishedDate}</div>
+            <div className="text-slate-500 pt-2">
+              Post started on {startDate}{" "}
+              {/* Display startTime (publication date) */}
+            </div>
             <div className="pt-4">{blog.content}</div>
           </div>
           <div className="col-span-4">
